@@ -4,4 +4,6 @@ V0.2 sample snapshot of the private [`seat-mentor-board`](https://github.com/jos
 
 Sample plant data only — not live plant, no login, no backend.
 
-**Open the board:** [index.html](./index.html) in this repo, or the Pages URL once enabled.
+**Open:** https://raw.githack.com/joshuakonkle/seat-mentor-board-preview/main/index.html
+
+**First-party Pages (one click):** [Pages settings](https://github.com/joshuakonkle/seat-mentor-board-preview/settings/pages) → Deploy from a branch → `main` / `/ (root)` → Save. Then `https://joshuakonkle.github.io/seat-mentor-board-preview/`.
