@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seat coverage — mentor board</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --line: #2c3642;
+      --text: #e8edf2;
+      --muted: #8b98a5;
+      --yes: #3d9a6a;
+      --yes-bg: #1a3d2c;
+      --no: #c45c4a;
+      --no-bg: #3d221e;
+      --accent: #c9a227;
+      --vacant: #d4a017;
+      --vacant-bg: #3a3010;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1.25rem 1rem 0.75rem;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    header h1 { margin: 0; font-size: 1.15rem; font-weight: 600; letter-spacing: 0.02em; }
+    header p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.85rem; }
+    .asof { margin-top: 0.4rem; font-size: 0.8rem; color: var(--accent); }
+    .badge {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 2px;
+    }
+    main { padding: 0.75rem 0.75rem 2rem; max-width: 720px; margin: 0 auto; }
+    .rollup, .triage {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .rollup-line { font-size: 1.05rem; font-weight: 600; }
+    .rollup-line .ok { color: var(--yes); }
+    .rollup-line .open { color: var(--no); }
+    .section-label {
+      margin: 0 0 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .rollup ul, .triage-list { margin: 0; padding-left: 1.1rem; font-size: 0.9rem; }
+    .rollup li, .triage-list li { margin: 0.25rem 0; }
+    .tag {
+      display: inline-block;
+      margin-left: 0.35rem;
+      padding: 0.1rem 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border-radius: 2px;
+      vertical-align: middle;
+    }
+    .tag.vacant { background: var(--vacant-bg); color: var(--vacant); }
+    .tag.unsigned { background: var(--no-bg); color: var(--no); }
+    .mentor-block { margin-bottom: 1.25rem; }
+    .mentor-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.35rem 0.15rem 0.5rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0.55rem;
+    }
+    .mentor-name { font-size: 0.95rem; font-weight: 600; }
+    .mentor-name .last { color: var(--accent); }
+    .mentor-stat { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      padding: 0.85rem 1rem;
+    }
+    .card.open-edge { border-left: 3px solid var(--no); }
+    .card.vacant-edge { border-left: 3px solid var(--vacant); }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .seat { font-size: 1rem; font-weight: 600; }
+    .sign {
+      flex-shrink: 0;
+      padding: 0.25rem 0.55rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .sign.yes { background: var(--yes-bg); color: var(--yes); }
+    .sign.no { background: var(--no-bg); color: var(--no); }
+    .sign.vacant { background: var(--vacant-bg); color: var(--vacant); }
+    .trainee { font-size: 0.85rem; color: var(--muted); }
+    .trainee strong { color: var(--text); font-weight: 500; }
+    footer { text-align: center; color: var(--muted); font-size: 0.75rem; padding: 1rem; }
+    .desk { display: none; }
+    @media (min-width: 640px) {
+      .cards-only { display: none; }
+      .desk { display: block; }
+      table { width: 100%; border-collapse: collapse; }
+      thead th {
+        text-align: left;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--line);
+      }
+      tbody td {
+        padding: 0.65rem 0.75rem;
+        border-bottom: 1px solid var(--line);
+        font-size: 0.95rem;
+      }
+      tbody tr.mentor-row td {
+        padding-top: 1rem;
+        border-bottom: none;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: 0.03em;
+      }
+      tbody tr:not(.mentor-row):hover { background: #151c24; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Seat coverage today</h1>
+    <p>Ops lead status view · grouped by mentor</p>
+    <div class="asof">As of Fri 4 Sep · Day shift (sample)</div>
+    <span class="badge">V0.2 sample · not live plant data</span>
+  </header>
+  <main>
+    <section class="rollup" id="rollup" aria-label="Today roll-up"></section>
+    <section class="triage" id="triage" aria-label="Open seats triage"></section>
+    <div class="desk">
+      <table>
+        <thead>
+          <tr>
+            <th>Seat</th>
+            <th>Trainee</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="cards-only" id="cards"></div>
+  </main>
+  <footer>Digital Knowledge · product-vet V0.2 · status review · private demo</footer>
+  <script>
+    const seats = [
+      { seat: "Line 2 — Controls tech", mentorFirst: "M.", mentorLast: "Ortega", trainee: "J. Hale", signed: true, vacant: false },
+      { seat: "Night — Hydraulics", mentorFirst: "R.", mentorLast: "Quinn", trainee: "A. Patel", signed: false, vacant: false },
+      { seat: "Pack — Conveyor tech", mentorFirst: "M.", mentorLast: "Ortega", trainee: "S. Kim", signed: true, vacant: false },
+      { seat: "Utilities — Boiler", mentorFirst: "D.", mentorLast: "Chen", trainee: "T. Brooks", signed: false, vacant: false },
+      { seat: "Fab — Millwright A", mentorFirst: "R.", mentorLast: "Quinn", trainee: "L. Diaz", signed: true, vacant: false },
+      { seat: "QC — Gauge tech", mentorFirst: "D.", mentorLast: "Chen", trainee: null, signed: false, vacant: true },
+    ];
+
+    function mentorLabel(r) { return r.mentorFirst + " " + r.mentorLast; }
+    function statusLabel(r) {
+      if (r.signed) return { cls: "yes", text: "Y · signed" };
+      if (r.vacant) return { cls: "vacant", text: "VACANT" };
+      return { cls: "no", text: "N · not signed" };
+    }
+    function traineeLabel(r) {
+      if (r.vacant) return "No trainee assigned";
+      return r.trainee;
+    }
+
+    const signedCount = seats.filter((r) => r.signed).length;
+    const openSeats = seats.filter((r) => !r.signed);
+
+    const rollup = document.getElementById("rollup");
+    let rollupHtml =
+      `<div class="rollup-line"><span class="ok">${signedCount} of ${seats.length} signed</span>` +
+      ` · <span class="open">${openSeats.length} open</span></div>`;
+    rollupHtml += `<p class="section-label" style="margin-top:0.75rem">Not signed off</p><ul>`;
+    openSeats.forEach((r) => {
+      const tag = r.vacant
+        ? `<span class="tag vacant">VACANT</span>`
+        : `<span class="tag unsigned">UNSIGNED</span>`;
+      rollupHtml += `<li>${r.seat} <span style="color:var(--muted)">· ${mentorLabel(r)}</span> ${tag}</li>`;
+    });
+    rollupHtml += `</ul>`;
+    rollup.innerHTML = rollupHtml;
+
+    const triage = document.getElementById("triage");
+    let triageHtml = `<p class="section-label">Triage — open now</p>`;
+    openSeats.forEach((r) => {
+      const st = statusLabel(r);
+      const edge = r.vacant ? "vacant-edge" : "open-edge";
+      triageHtml +=
+        `<article class="card ${edge}">` +
+        `<div class="card-top"><div class="seat">${r.seat}</div>` +
+        `<span class="sign ${st.cls}">${st.text}</span></div>` +
+        `<div class="trainee">Mentor: <strong>${mentorLabel(r)}</strong> · ${traineeLabel(r)}</div>` +
+        `</article>`;
+    });
+    triage.innerHTML = triageHtml;
+
+    const byMentor = {};
+    seats.forEach((r) => {
+      const key = r.mentorLast;
+      if (!byMentor[key]) byMentor[key] = [];
+      byMentor[key].push(r);
+    });
+    const mentorKeys = Object.keys(byMentor).sort((a, b) => a.localeCompare(b));
+
+    const tbody = document.getElementById("rows");
+    const cards = document.getElementById("cards");
+
+    mentorKeys.forEach((key) => {
+      const group = byMentor[key];
+      const label = mentorLabel(group[0]);
+      const gSigned = group.filter((r) => r.signed).length;
+
+      const mtr = document.createElement("tr");
+      mtr.className = "mentor-row";
+      mtr.innerHTML = `<td colspan="3">${label.toUpperCase()} · ${gSigned}/${group.length} signed</td>`;
+      tbody.appendChild(mtr);
+
+      const block = document.createElement("section");
+      block.className = "mentor-block";
+      block.innerHTML =
+        `<div class="mentor-head">` +
+        `<div class="mentor-name">${group[0].mentorFirst} <span class="last">${group[0].mentorLast}</span></div>` +
+        `<div class="mentor-stat">${gSigned} of ${group.length} signed</div>` +
+        `</div>`;
+
+      group.forEach((r) => {
+        const st = statusLabel(r);
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          `<td>${r.seat}</td>` +
+          `<td>${traineeLabel(r)}</td>` +
+          `<td><span class="sign ${st.cls}">${st.text}</span></td>`;
+        tbody.appendChild(tr);
+
+        const edge = r.vacant ? "vacant-edge" : (!r.signed ? "open-edge" : "");
+        const card = document.createElement("article");
+        card.className = "card " + edge;
+        card.innerHTML =
+          `<div class="card-top"><div class="seat">${r.seat}</div>` +
+          `<span class="sign ${st.cls}">${st.text}</span></div>` +
+          `<div class="trainee">Trainee: <strong>${traineeLabel(r)}</strong></div>`;
+        block.appendChild(card);
+      });
+
+      cards.appendChild(block);
+    });
+  </script>
+</body>
+</html>
